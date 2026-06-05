@@ -272,14 +272,10 @@ select.ctl { padding-right: var(--s4); }
   transition: color var(--dur-1) var(--ease);
 }
 .footer__links a:hover { color: var(--ink); }
-.footer__links .kofi {
-  color: var(--ink);
-  background: var(--accent-dim);
-  border: var(--hair) solid color-mix(in srgb, var(--accent) 30%, transparent);
-  border-radius: 999px;
-  padding: 4px var(--s3);
-}
-.footer__links .kofi:hover { border-color: color-mix(in srgb, var(--accent) 55%, transparent); }
+/* the tip link uses the primary-button look; keep its text colour against the
+   generic footer link colour rule above */
+.footer__links a.kofi,
+.footer__links a.kofi:hover { color: var(--accent-ink); }
 
 @media (max-width: 720px) {
   .panes { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
