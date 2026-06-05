@@ -10,13 +10,15 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "og": "node scripts/og.mjs"
   },
   "dependencies": {
     "markdown-it": "^14.1.0",
     "shiki": "^3.2.1"
   },
   "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
     "@types/markdown-it": "^14.1.2",
     "typescript": "^5.7.3",
     "vite": "^6.0.7"

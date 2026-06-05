@@ -8,7 +8,7 @@
  */
 import MarkdownIt from "markdown-it";
 import type { HighlighterCore } from "shiki/core";
-import { decorate, type FenceMode } from "./fence.ts";
+import { decorate, decoratePlain, type FenceMode } from "./fence.ts";
 
 export interface ConvertOptions {
   hl: HighlighterCore;
@@ -28,7 +28,8 @@ let ctx: ConvertOptions | null = null;
 md.renderer.rules.fence = (tokens, idx) => {
   const token = tokens[idx];
   const lang = token.info.trim().split(/\s+/)[0] ?? "";
-  if (!ctx) return `<pre><code>${token.content}</code></pre>`;
+  // No context means highlighter-free: render a plain fence.
+  if (!ctx) return decoratePlain(token.content, lang);
   return decorate(ctx.hl, token.content, lang, ctx.mode, ctx.theme);
 };
 
@@ -40,4 +41,10 @@ export function convert(markdown: string, opts: ConvertOptions): string {
   } finally {
     ctx = null;
   }
+}
+
+/** Render with plain fences only, no Shiki. For instant paint and offline. */
+export function convertPlain(markdown: string): string {
+  ctx = null;
+  return md.render(markdown);
 }

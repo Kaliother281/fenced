@@ -1,6 +1,6 @@
 import "./style.css";
 import { getHighlighter, THEMES, DEFAULT_THEME } from "./core/highlight.ts";
-import { convert } from "./core/convert.ts";
+import { convert, convertPlain } from "./core/convert.ts";
 import { type FenceMode } from "./core/fence.ts";
 import { PREVIEW_CSS, type UiTheme } from "./core/styles.ts";
 import { buildDocument, downloadFile } from "./core/export.ts";
@@ -30,13 +30,50 @@ const uploadBtn = $<HTMLButtonElement>("uploadBtn");
 const sampleBtn = $<HTMLButtonElement>("sampleBtn");
 const fileInput = $<HTMLInputElement>("fileInput");
 
-// ── state ───────────────────────────────────────────────────────────────────
+// ── state + persistence ─────────────────────────────────────────────────────
+const STORAGE_KEY = "fenced:v1";
+
 const state = {
   mode: "term" as FenceMode,
   syntaxTheme: DEFAULT_THEME,
   uiTheme: "dark" as UiTheme,
   filename: "markdown",
 };
+
+interface Saved {
+  content: string;
+  mode: FenceMode;
+  syntaxTheme: string;
+  uiTheme: UiTheme;
+  filename: string;
+}
+
+function loadSaved(): Saved | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as Saved) : null;
+  } catch {
+    return null;
+  }
+}
+
+// Everything lives in localStorage only. Nothing leaves the browser.
+function save(): void {
+  try {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        content: editor.value,
+        mode: state.mode,
+        syntaxTheme: state.syntaxTheme,
+        uiTheme: state.uiTheme,
+        filename: state.filename,
+      } satisfies Saved),
+    );
+  } catch {
+    /* storage unavailable (private mode); run without persistence */
+  }
+}
 
 // populate the syntax theme picker
 for (const group of THEMES) {
@@ -55,33 +92,50 @@ for (const group of THEMES) {
 // ── render ──────────────────────────────────────────────────────────────────
 let highlighterReady = false;
 
+function decoratedCount(): string {
+  const n = doc.querySelectorAll(".fenced").length;
+  return `${n} block${n === 1 ? "" : "s"} decorated`;
+}
+
+const EMPTY_HTML =
+  '<p style="color:var(--ink-faint);font-family:var(--font-mono);font-size:var(--step--1)">paste or drop markdown on the left.</p>';
+
 async function render(): Promise<void> {
-  const hl = await getHighlighter();
-  highlighterReady = true;
   const src = editor.value;
   if (!src.trim()) {
-    doc.innerHTML =
-      '<p style="color:var(--ink-faint);font-family:var(--font-mono);font-size:var(--step--1)">preview appears here.</p>';
+    doc.innerHTML = EMPTY_HTML;
     status.textContent = "";
     return;
   }
-  doc.innerHTML = convert(src, {
-    hl,
-    mode: state.mode,
-    theme: state.syntaxTheme,
-  });
-  const blocks = doc.querySelectorAll(".fenced").length;
-  status.textContent = `${blocks} block${blocks === 1 ? "" : "s"} decorated`;
+
+  // Instant paint: show a plain-rendered preview before Shiki finishes loading.
+  if (!highlighterReady) {
+    doc.innerHTML = convertPlain(src);
+    status.textContent = "highlighting…";
+  }
+
+  let hl;
+  try {
+    hl = await getHighlighter();
+    highlighterReady = true;
+  } catch {
+    // Offline or blocked: keep the plain render, say so, carry on.
+    doc.innerHTML = convertPlain(src);
+    status.textContent = "plain mode · highlighter offline";
+    return;
+  }
+
+  doc.innerHTML = convert(src, { hl, mode: state.mode, theme: state.syntaxTheme });
+  status.textContent = decoratedCount();
 }
 
 let timer: number | undefined;
 function scheduleRender(): void {
-  if (!highlighterReady) {
-    void render();
-    return;
-  }
   window.clearTimeout(timer);
-  timer = window.setTimeout(() => void render(), 140);
+  timer = window.setTimeout(() => {
+    save();
+    void render();
+  }, 140);
 }
 
 // ── events ──────────────────────────────────────────────────────────────────
@@ -94,11 +148,13 @@ modeCtl.addEventListener("click", (e) => {
   for (const b of modeCtl.querySelectorAll("button")) {
     b.setAttribute("aria-selected", String(b === btn));
   }
+  save();
   void render();
 });
 
 themeSelect.addEventListener("change", () => {
   state.syntaxTheme = themeSelect.value;
+  save();
   void render();
 });
 
@@ -106,6 +162,7 @@ themeBtn.addEventListener("click", () => {
   state.uiTheme = state.uiTheme === "dark" ? "light" : "dark";
   document.documentElement.dataset.theme = state.uiTheme;
   themeBtn.textContent = `❯ theme: ${state.uiTheme}`;
+  save();
 });
 
 // flash helper for button confirmations
@@ -153,6 +210,7 @@ fileInput.addEventListener("change", () => {
 async function loadFile(file: File): Promise<void> {
   editor.value = await file.text();
   state.filename = file.name.replace(/\.(md|markdown)$/i, "") || "markdown";
+  save();
   void render();
 }
 
@@ -177,8 +235,32 @@ editor.addEventListener("drop", onDrop);
 sampleBtn.addEventListener("click", () => {
   editor.value = SAMPLE;
   state.filename = "sample";
+  save();
   void render();
 });
 
 // ── boot ────────────────────────────────────────────────────────────────────
+/** Reflect current state onto the UI controls. */
+function syncUi(): void {
+  document.documentElement.dataset.theme = state.uiTheme;
+  themeBtn.textContent = `❯ theme: ${state.uiTheme}`;
+  themeSelect.value = state.syntaxTheme;
+  for (const b of modeCtl.querySelectorAll<HTMLButtonElement>("button[data-mode]")) {
+    b.setAttribute("aria-selected", String(b.dataset.mode === state.mode));
+  }
+}
+
+const saved = loadSaved();
+if (saved && typeof saved.content === "string") {
+  editor.value = saved.content;
+  state.mode = saved.mode ?? state.mode;
+  state.syntaxTheme = saved.syntaxTheme ?? state.syntaxTheme;
+  state.uiTheme = saved.uiTheme ?? state.uiTheme;
+  state.filename = saved.filename ?? state.filename;
+} else {
+  // First visit: let the page demo itself.
+  editor.value = SAMPLE;
+  state.filename = "sample";
+}
+syncUi();
 void render();

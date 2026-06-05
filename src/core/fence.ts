@@ -52,6 +52,19 @@ function themeVars(bg: string, fg: string, mode: "term" | "themed"): string {
 }
 
 /**
+ * Plain decoration: no highlighting, no highlighter needed. Used for plain
+ * mode and as the instant-paint / offline fallback while Shiki loads.
+ */
+export function decoratePlain(code: string, lang: string): string {
+  const src = code.replace(/\n$/, "");
+  const body = `<pre><code>${escapeHtml(src)}</code></pre>`;
+  return `<div class="fenced fenced--plain" data-lang="${escapeHtml(lang)}">${bar(
+    "plain",
+    langLabel(lang),
+  )}<div class="fenced__body">${body}</div></div>`;
+}
+
+/**
  * Decorate a single block. `hl` must already be loaded (codeToHtml is sync).
  */
 export function decorate(
@@ -64,13 +77,7 @@ export function decorate(
   const src = code.replace(/\n$/, "");
   const label = langLabel(lang);
 
-  if (mode === "plain") {
-    const body = `<pre><code>${escapeHtml(src)}</code></pre>`;
-    return `<div class="fenced fenced--plain" data-lang="${escapeHtml(lang)}">${bar(
-      "plain",
-      label,
-    )}<div class="fenced__body">${body}</div></div>`;
-  }
+  if (mode === "plain") return decoratePlain(code, lang);
 
   const resolved = resolveLang(hl, lang);
   const highlighted = hl.codeToHtml(src, {
