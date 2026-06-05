@@ -122,6 +122,12 @@ export async function getHighlighter(): Promise<HighlighterCore> {
   return loading;
 }
 
+/** The background/foreground a theme paints its code surface with. */
+export function getThemeColors(hl: HighlighterCore, theme: string): { bg: string; fg: string } {
+  const t = hl.getTheme(theme);
+  return { bg: t.bg || "#1e1e2e", fg: t.fg || "#cdd6f4" };
+}
+
 /** Resolve a user-written fence language to a loaded Shiki id (or plaintext). */
 export function resolveLang(hl: HighlighterCore, lang: string): string {
   const raw = (lang || "").toLowerCase().trim();

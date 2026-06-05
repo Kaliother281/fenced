@@ -94,14 +94,28 @@ export const PROSE_CSS = `
 }
 `;
 
-/** The signature: the three fenced code-block modes. */
+/**
+ * The signature: the three fenced code-block modes.
+ *
+ * Every colour is a custom property with a page-token fallback. Plain blocks
+ * stay on the page surface; terminal and themed blocks get their --fence-*
+ * values overridden inline with the chosen Shiki theme's own colours, so a
+ * dark Catppuccin window stays dark and readable on a light page.
+ */
 export const FENCE_CSS = `
 .fenced {
+  --fence-bg: var(--surface);
+  --fence-fg: var(--ink);
+  --fence-bar-bg: transparent;
+  --fence-border: var(--border);
+  --fence-muted: var(--ink-faint);
+  --fence-ln: var(--ink-faint);
   margin: 1.4em 0;
-  border: 1px solid var(--border);
+  border: 1px solid var(--fence-border);
   border-radius: 12px;
   overflow: hidden;
-  background: var(--surface);
+  background: var(--fence-bg);
+  color: var(--fence-fg);
   box-shadow: 0 1px 0 rgba(255,255,255,0.02), 0 12px 32px rgba(0,0,0,0.18);
   font-family: var(--font-mono);
   font-size: 0.875rem;
@@ -111,26 +125,26 @@ export const FENCE_CSS = `
   align-items: center;
   gap: 12px;
   padding: 10px 14px;
-  border-bottom: 1px solid var(--border);
-  color: var(--ink-faint);
+  background: var(--fence-bar-bg);
+  border-bottom: 1px solid var(--fence-border);
+  color: var(--fence-muted);
   font-size: 0.8125rem;
 }
 .fenced__dots { display: flex; gap: 6px; }
 .fenced__dots i { width: 11px; height: 11px; border-radius: 50%; background: var(--border-strong); }
-.fenced__title { color: var(--ink-muted); }
-.fenced__lang { margin-left: auto; color: var(--ink-faint); }
-.fenced__body { padding: 14px 18px; overflow-x: auto; line-height: 1.7; }
+.fenced__title { color: var(--fence-muted); }
+.fenced__lang { margin-left: auto; color: var(--fence-muted); }
+.fenced__body { padding: 14px 18px; background: var(--fence-bg); color: var(--fence-fg); overflow-x: auto; line-height: 1.7; }
 .fenced__body pre { margin: 0; background: transparent !important; }
 .fenced__body code { font-family: inherit; }
 
 /* terminal mode: window chrome, lit dots */
-.fenced--term .fenced__bar { background: var(--surface-2); }
+.fenced--term { --fence-bar-bg: var(--surface-2); }
 .fenced--term .fenced__dots i:nth-child(1) { background: #f38ba8; }
 .fenced--term .fenced__dots i:nth-child(2) { background: #f9e2af; }
 .fenced--term .fenced__dots i:nth-child(3) { background: #a6e3a1; }
 
 /* themed mode: clean bar, line numbers */
-.fenced--themed .fenced__bar { background: transparent; }
 .fenced--themed .fenced__body pre { counter-reset: ln; }
 .fenced--themed .fenced__body .line {
   counter-increment: ln;
@@ -143,15 +157,12 @@ export const FENCE_CSS = `
   width: 2.2em;
   margin-right: 1em;
   text-align: right;
-  color: var(--ink-faint);
-  opacity: 0.55;
+  color: var(--fence-ln);
   user-select: none;
 }
 
 /* plain mode: barely-there chrome, no highlighting */
 .fenced--plain { box-shadow: none; }
-.fenced--plain .fenced__bar { background: transparent; }
-.fenced--plain .fenced__body { color: var(--ink); }
 .fenced--plain .fenced__body pre { white-space: pre; }
 `;
 

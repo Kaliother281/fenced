@@ -99,7 +99,7 @@ Deploys to GitHub Pages automatically on every push to `main` (see [.github/work
 ## roadmap
 
 - [ ] Per-block mode and language overrides from the fence info string.
-- [ ] Terminal and themed blocks carry their own theme background, so dark Catppuccin fences pop on any page.
+- [x] Terminal and themed blocks carry their own theme background, so dark Catppuccin fences pop on any page.
 - [ ] Per-snippet copy button in the export, opt-in.
 - [ ] Font size and line height controls.
 - [ ] Shareable settings via URL.
