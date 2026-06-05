@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>fenced · decorated code blocks, real HTML, no screenshots</title>
 <meta name="description" content="Convert Markdown into gorgeous, self-contained HTML with code blocks rendered as decorated fences. 100% client-side. Nothing is ever uploaded." />
+<link rel="canonical" href="https://fenced.dev/" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <meta name="theme-color" content="#0d0e10" />
@@ -24,6 +25,68 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "fenced",
+  "url": "https://fenced.dev/",
+  "description": "A free, client-side tool that converts Markdown into gorgeous, self-contained HTML, with every code block rendered as a decorated fence: terminal, themed, or plain. Real selectable HTML, not screenshots. Nothing is ever uploaded.",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any (web browser)",
+  "browserRequirements": "Requires a modern web browser with JavaScript",
+  "softwareVersion": "0.1.0",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "license": "https://opensource.org/licenses/MIT",
+  "author": { "@type": "Person", "name": "Lars Holmström" },
+  "featureList": [
+    "Markdown to self-contained HTML",
+    "Syntax highlighting via Shiki",
+    "Terminal, themed, and plain code block styles",
+    "100% client-side, no upload",
+    "Copy or download portable HTML"
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Does fenced upload my Markdown or code?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No. Everything runs in your browser. Parsing and syntax highlighting happen on your device, and nothing is ever uploaded or sent to a server." }
+    },
+    {
+      "@type": "Question",
+      "name": "How is fenced different from a code screenshot tool like Carbon or ray.so?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Those tools export an image. fenced outputs real, selectable HTML, so readers can copy your code, it stays sharp on any screen, and it remains readable by screen readers and search engines. No screenshots." }
+    },
+    {
+      "@type": "Question",
+      "name": "Is the exported HTML self-contained?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Syntax colors are inlined on each token and the styles are bundled into the file, so a downloaded .html works anywhere with no external stylesheet. You can also lift a single decorated code block into a CMS or an email." }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I use the output in an email newsletter?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Because the syntax colors are inline styles, the decorated code blocks render in email clients that strip external CSS, which most highlighted-code tools cannot do." }
+    },
+    {
+      "@type": "Question",
+      "name": "Which languages and themes are supported?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Highlighting is powered by Shiki, with languages including TypeScript, Python, Rust, Go, and many more, and themes including all four Catppuccin flavors plus GitHub, One Dark Pro, Nord, Dracula, Tokyo Night, and others." }
+    },
+    {
+      "@type": "Question",
+      "name": "Is fenced free and open source?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes. fenced is free and MIT licensed, and the source is available on GitHub." }
+    }
+  ]
+}
+</script>
 </head>
 <body>
 <div class="app">
@@ -93,6 +156,7 @@ everything runs in your browser. nothing is uploaded."></textarea>
   <footer class="footer">
     <span class="footer__note">Processed in browser. no uploads.</span>
     <nav class="footer__links">
+      <a href="#about">about</a>
       <a href="/privacy.html">privacy</a>
       <a href="/terms.html">terms</a>
       <a href="https://github.com/lars-1987/fenced" target="_blank" rel="noopener">github</a>
@@ -106,6 +170,73 @@ everything runs in your browser. nothing is uploaded."></textarea>
     </nav>
   </footer>
 </div>
+
+<main class="seo" id="about">
+  <section class="seo__block">
+    <p class="seo__eyebrow">what it is</p>
+    <h2>Markdown to self-contained HTML, decorated and real.</h2>
+    <p>fenced is a free, browser-based converter that turns Markdown into clean, self-contained HTML. Every fenced code block is rendered as a decorated window with proper syntax highlighting, and the result stays real, selectable HTML you can copy, host, or paste anywhere. No screenshots, no image exports, no account.</p>
+    <p>Screenshots of code go stale the moment you edit, cannot be copied, ignore dark mode, and read poorly on a phone. fenced keeps your code as text and just dresses it up, so it stays accessible to readers, screen readers, and search engines.</p>
+  </section>
+
+  <section class="seo__block">
+    <p class="seo__eyebrow">how it works</p>
+    <h2>Three ways to dress a fence.</h2>
+    <p>Paste or drop a Markdown file, pick a look, then copy the HTML or download a single self-contained file. Every code block resolves to one of three modes:</p>
+    <ul class="seo__modes">
+      <li><strong>Terminal.</strong> A window with traffic-light chrome and a language label, the signature look.</li>
+      <li><strong>Themed.</strong> A clean syntax-highlighted card with line numbers.</li>
+      <li><strong>Plain.</strong> Minimal chrome, no highlighting, just the code.</li>
+    </ul>
+    <p>Highlighting is powered by Shiki, with the four Catppuccin flavors plus GitHub, One Dark Pro, Nord, Dracula, Tokyo Night, and more. Tokens ship as inline styles, so an exported file needs no stylesheet, just the markup.</p>
+  </section>
+
+  <section class="seo__block">
+    <p class="seo__eyebrow">where it fits</p>
+    <h2>Built for blogs, docs, and email.</h2>
+    <p>Because the output is portable HTML with inline styles, a fenced block drops cleanly into a blog post, a CMS like Ghost or WordPress, static-site documentation, or even an email newsletter, where most highlighted-code tools fall apart. Copy a single block, or convert a whole document at once.</p>
+  </section>
+
+  <section class="seo__block" id="faq">
+    <p class="seo__eyebrow">faq</p>
+    <h2>Questions, answers.</h2>
+    <dl class="faq">
+      <div class="faq__item">
+        <dt>Does fenced upload my Markdown or code?</dt>
+        <dd>No. Everything runs in your browser. Parsing and syntax highlighting happen on your device, and nothing is ever uploaded or sent to a server.</dd>
+      </div>
+      <div class="faq__item">
+        <dt>How is fenced different from a code screenshot tool like Carbon or ray.so?</dt>
+        <dd>Those tools export an image. fenced outputs real, selectable HTML, so readers can copy your code, it stays sharp on any screen, and it remains readable by screen readers and search engines. No screenshots.</dd>
+      </div>
+      <div class="faq__item">
+        <dt>Is the exported HTML self-contained?</dt>
+        <dd>Yes. Syntax colors are inlined on each token and the styles are bundled into the file, so a downloaded .html works anywhere with no external stylesheet. You can also lift a single decorated code block into a CMS or an email.</dd>
+      </div>
+      <div class="faq__item">
+        <dt>Can I use the output in an email newsletter?</dt>
+        <dd>Yes. Because the syntax colors are inline styles, the decorated code blocks render in email clients that strip external CSS, which most highlighted-code tools cannot do.</dd>
+      </div>
+      <div class="faq__item">
+        <dt>Which languages and themes are supported?</dt>
+        <dd>Highlighting is powered by Shiki, with languages including TypeScript, Python, Rust, Go, and many more, and themes including all four Catppuccin flavors plus GitHub, One Dark Pro, Nord, Dracula, Tokyo Night, and others.</dd>
+      </div>
+      <div class="faq__item">
+        <dt>Is fenced free and open source?</dt>
+        <dd>Yes. fenced is free and MIT licensed, and the source is available on <a href="https://github.com/lars-1987/fenced" target="_blank" rel="noopener">GitHub</a>.</dd>
+      </div>
+    </dl>
+  </section>
+</main>
+
+<footer class="site-foot">
+  <span>© 2026 fenced · built in Melbourne</span>
+  <nav>
+    <a href="/privacy.html">privacy</a>
+    <a href="/terms.html">terms</a>
+    <a href="https://github.com/lars-1987/fenced" target="_blank" rel="noopener">github</a>
+  </nav>
+</footer>
 <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

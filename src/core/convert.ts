@@ -1,19 +1,18 @@
 /**
  * Markdown to decorated HTML.
  *
- * markdown-it handles the prose; every fenced code block is routed through
- * core/fence.ts so it comes out as a decorated `.fenced` window instead of a
- * bare `<pre>`. The body markup is identical whether it lands in the live
- * preview or an exported file.
+ * markdown-it handles the prose; every fenced code block is routed through a
+ * `renderFence` callback so it comes out as a decorated `.fenced` window
+ * instead of a bare `<pre>`. This module has no Shiki dependency: the caller
+ * supplies the (highlighted) decorator, which lives in the deferred chunk.
+ * The body markup is identical whether it lands in the preview or an export.
  */
 import MarkdownIt from "markdown-it";
-import type { HighlighterCore } from "shiki/core";
-import { decorate, decoratePlain, type FenceMode } from "./fence.ts";
+import { decoratePlain } from "./fence.ts";
 
 export interface ConvertOptions {
-  hl: HighlighterCore;
-  mode: FenceMode;
-  theme: string;
+  /** Turn a code block into decorated HTML. Supplied by the caller. */
+  renderFence: (code: string, lang: string) => string;
 }
 
 const md = new MarkdownIt({
@@ -30,7 +29,7 @@ md.renderer.rules.fence = (tokens, idx) => {
   const lang = token.info.trim().split(/\s+/)[0] ?? "";
   // No context means highlighter-free: render a plain fence.
   if (!ctx) return decoratePlain(token.content, lang);
-  return decorate(ctx.hl, token.content, lang, ctx.mode, ctx.theme);
+  return ctx.renderFence(token.content, lang);
 };
 
 /** Render Markdown into the inner HTML of a `.fenced-doc` body. */

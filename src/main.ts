@@ -1,7 +1,7 @@
 import "./style.css";
-import { getHighlighter, THEMES, DEFAULT_THEME } from "./core/highlight.ts";
 import { convert, convertPlain } from "./core/convert.ts";
 import { type FenceMode } from "./core/fence.ts";
+import { THEMES, DEFAULT_THEME } from "./core/themes.ts";
 import { PREVIEW_CSS, type UiTheme } from "./core/styles.ts";
 import { buildDocument, downloadFile } from "./core/export.ts";
 import { initAnalytics, track } from "./core/analytics.ts";
@@ -92,6 +92,9 @@ for (const group of THEMES) {
 
 // ── render ──────────────────────────────────────────────────────────────────
 let highlighterReady = false;
+// Shiki and every grammar live here; loaded on demand so they never block
+// first paint. Cached after the first successful import.
+let hlmod: typeof import("./core/highlight.ts") | null = null;
 
 function decoratedCount(): string {
   const n = doc.querySelectorAll(".fenced").length;
@@ -115,9 +118,10 @@ async function render(): Promise<void> {
     status.textContent = "highlighting…";
   }
 
-  let hl;
+  let mod, hl;
   try {
-    hl = await getHighlighter();
+    mod = hlmod ?? (hlmod = await import("./core/highlight.ts"));
+    hl = await mod.getHighlighter();
     highlighterReady = true;
   } catch {
     // Offline or blocked: keep the plain render, say so, carry on.
@@ -126,7 +130,10 @@ async function render(): Promise<void> {
     return;
   }
 
-  doc.innerHTML = convert(src, { hl, mode: state.mode, theme: state.syntaxTheme });
+  const { decorate } = mod;
+  doc.innerHTML = convert(src, {
+    renderFence: (code, lang) => decorate(hl, code, lang, state.mode, state.syntaxTheme),
+  });
   status.textContent = decoratedCount();
 }
 

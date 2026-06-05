@@ -8,6 +8,7 @@
  */
 import { createHighlighterCore, type HighlighterCore } from "shiki/core";
 import { createJavaScriptRegexEngine } from "shiki/engine/javascript";
+import { bar, escapeHtml, langLabel, themeVars, decoratePlain, type FenceMode } from "./fence.ts";
 
 // themes
 import mocha from "@shikijs/themes/catppuccin-mocha";
@@ -48,42 +49,6 @@ import java from "@shikijs/langs/java";
 import ruby from "@shikijs/langs/ruby";
 import php from "@shikijs/langs/php";
 import diff from "@shikijs/langs/diff";
-
-/** Themes offered in the picker. Grouped for the UI; Mocha is the default. */
-export const THEMES: { group: string; items: { id: string; label: string }[] }[] = [
-  {
-    group: "catppuccin",
-    items: [
-      { id: "catppuccin-mocha", label: "mocha" },
-      { id: "catppuccin-macchiato", label: "macchiato" },
-      { id: "catppuccin-frappe", label: "frappé" },
-      { id: "catppuccin-latte", label: "latte" },
-    ],
-  },
-  {
-    group: "dark",
-    items: [
-      { id: "github-dark", label: "github dark" },
-      { id: "one-dark-pro", label: "one dark pro" },
-      { id: "tokyo-night", label: "tokyo night" },
-      { id: "night-owl", label: "night owl" },
-      { id: "nord", label: "nord" },
-      { id: "dracula", label: "dracula" },
-      { id: "rose-pine", label: "rosé pine" },
-      { id: "vitesse-dark", label: "vitesse dark" },
-    ],
-  },
-  {
-    group: "light",
-    items: [
-      { id: "github-light", label: "github light" },
-      { id: "vitesse-light", label: "vitesse light" },
-      { id: "rose-pine-dawn", label: "rosé pine dawn" },
-    ],
-  },
-];
-
-export const DEFAULT_THEME = "catppuccin-mocha";
 
 const THEME_MODULES = [
   mocha, macchiato, frappe, latte, githubDark, oneDarkPro, tokyoNight,
@@ -134,4 +99,27 @@ export function resolveLang(hl: HighlighterCore, lang: string): string {
   if (!raw) return "plaintext";
   const canonical = ALIAS[raw] ?? raw;
   return hl.getLoadedLanguages().includes(canonical) ? canonical : "plaintext";
+}
+
+/**
+ * Decorate one fenced block with Shiki highlighting and the chosen chrome.
+ * `hl` must already be loaded (codeToHtml is sync).
+ */
+export function decorate(
+  hl: HighlighterCore,
+  code: string,
+  lang: string,
+  mode: FenceMode,
+  theme: string,
+): string {
+  if (mode === "plain") return decoratePlain(code, lang);
+
+  const src = code.replace(/\n$/, "");
+  const resolved = resolveLang(hl, lang);
+  const highlighted = hl.codeToHtml(src, { lang: resolved, theme, structure: "classic" });
+  const { bg, fg } = getThemeColors(hl, theme);
+  const cls = mode === "term" ? "fenced--term" : "fenced--themed";
+  return `<div class="fenced ${cls}" data-lang="${escapeHtml(
+    lang,
+  )}" style="${themeVars(bg, fg, mode)}">${bar(mode, langLabel(lang))}<div class="fenced__body">${highlighted}</div></div>`;
 }
